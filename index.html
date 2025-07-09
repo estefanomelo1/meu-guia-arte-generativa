@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Interativo de Arte Generativa com Processing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .nav-link {
+            transition: color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #14B8A6;
+        }
+        .tab-button.active {
+            border-color: #14B8A6;
+            background-color: #F0FDF4;
+            color: #14B8A6;
+        }
+        .modal {
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-zinc-800">
+    <!-- Chosen Palette: Warm Harmony (Background: bg-stone-50, Text: text-zinc-800, Accent: bg-teal-600/text-teal-600) -->
+    <!-- Application Structure Plan: A single-page "Learning Hub" with a top navigation bar for smooth scrolling to thematic sections: "Início", "Fundamentos", "Técnicas", "Projetos", "Recursos". This structure transforms the linear tutorial into an explorable, non-linear experience. "Fundamentos" and "Técnicas" use interactive tabs with live canvas demonstrations, allowing users to learn by doing rather than just reading. "Projetos" features a modal gallery to display code and a live preview simultaneously, making the examples tangible. This user-centric, interactive design was chosen to maximize engagement and comprehension of the abstract concepts of generative art. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation Method -> Interaction -> Justification. 
+        - What is Art/Why Processing -> Inform -> Side-by-side text blocks -> Reading -> Clear, concise intro.
+        - Shapes & Colors -> Demonstrate -> Interactive canvas with sliders -> User input updates canvas -> Hands-on learning of core drawing functions. Library: Vanilla JS Canvas API.
+        - random() vs. noise() -> Compare -> Two side-by-side animated canvases -> Observation -> Directly contrasts abrupt vs. smooth randomness, a key generative concept. Library: Vanilla JS Canvas API + Perlin Noise script.
+        - Transformations -> Demonstrate -> Interactive canvas with buttons -> User clicks trigger transforms -> Shows the effect of translate, rotate, scale immediately. Library: Vanilla JS Canvas API.
+        - Code Projects -> Showcase -> Modal with code block and live canvas preview -> Button click -> Connects abstract code to concrete visual output, reinforcing learning. Library: Vanilla JS Canvas API.
+        - Resources -> Inform -> Styled list with icons -> Click external links -> Provides clear pathways for further learning. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-teal-600">Arte Generativa</h1>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#inicio" class="nav-link font-semibold text-zinc-600">Início</a>
+                <a href="#fundamentos" class="nav-link font-semibold text-zinc-600">Fundamentos</a>
+                <a href="#tecnicas" class="nav-link font-semibold text-zinc-600">Técnicas</a>
+                <a href="#projetos" class="nav-link font-semibold text-zinc-600">Projetos</a>
+                <a href="#recursos" class="nav-link font-semibold text-zinc-600">Recursos</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <section id="inicio" class="text-center min-h-[60vh] flex flex-col justify-center">
+            <h2 class="text-4xl md:text-6xl font-bold mb-4">Desvende a Arte Generativa</h2>
+            <p class="text-lg md:text-xl text-zinc-600 max-w-3xl mx-auto mb-8">Um guia interativo para criar arte com código usando Processing.</p>
+            <div class="grid md:grid-cols-2 gap-8 text-left my-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-bold mb-3 text-teal-700">O que é Arte Generativa?</h3>
+                    <p class="text-zinc-600">É um campo fascinante na interseção da criatividade e da inteligência artificial. Aqui, o artista se torna um designer de sistemas, criando algoritmos que geram obras de arte de forma autônoma. A essência está na imprevisibilidade e originalidade que emergem da colaboração entre o humano e a máquina.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-bold mb-3 text-teal-700">Por que o Processing?</h3>
+                    <p class="text-zinc-600">Concebido como um "caderno de rascunhos de software", o Processing é a ferramenta ideal para iniciantes. Ele oferece feedback visual imediato, transformando a programação em uma extensão da prática artística. É gratuito, de código aberto e permite que você comece a "esboçar com código" rapidamente.</p>
+                </div>
+            </div>
+            <a href="#fundamentos" class="mt-8 bg-teal-600 text-white font-bold py-3 px-8 rounded-full hover:bg-teal-700 transition-colors text-lg inline-block mx-auto">Comece a Criar Agora</a>
+        </section>
+
+        <section id="fundamentos" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold">Fundamentos da Programação Criativa</h2>
+                <p class="text-lg text-zinc-600 mt-2 max-w-2xl mx-auto">Explore os blocos de construção essenciais para dar vida às suas ideias com código.</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-4 sm:p-8">
+                <div id="tabs-container" class="mb-4 flex flex-wrap -mx-2">
+                    <button data-tab="tab-structure" class="tab-button flex-grow text-sm sm:text-base p-3 m-2 border-b-2 font-semibold transition-colors duration-300">Estrutura: setup() & draw()</button>
+                    <button data-tab="tab-brushes" class="tab-button flex-grow text-sm sm:text-base p-3 m-2 border-b-2 font-semibold transition-colors duration-300">Pincéis: Formas & Cores</button>
+                    <button data-tab="tab-random" class="tab-button flex-grow text-sm sm:text-base p-3 m-2 border-b-2 font-semibold transition-colors duration-300">Coração: random()</button>
+                    <button data-tab="tab-loops" class="tab-button flex-grow text-sm sm:text-base p-3 m-2 border-b-2 font-semibold transition-colors duration-300">Repetição: Loops</button>
+                </div>
+                <div id="tab-content" class="min-h-[400px]">
+                    <div id="tab-structure-content" class="tab-pane">
+                        <h3 class="text-2xl font-bold mb-4 text-teal-700">A Estrutura Essencial: `setup()` e `draw()`</h3>
+                        <p class="text-zinc-600 mb-6">Todo sketch em Processing é construído em torno de duas funções principais que ditam seu ciclo de vida. Compreender a diferença entre elas é o primeiro passo para criar qualquer coisa, de uma imagem estática a uma animação complexa.</p>
+                        <div class="grid md:grid-cols-2 gap-6 text-center">
+                            <div class="border border-zinc-200 p-6 rounded-lg">
+                                <h4 class="font-bold text-xl mb-2"><code>void setup()</code></h4>
+                                <p class="text-zinc-600 mb-4">Executa <strong class="text-teal-600">apenas uma vez</strong> no início. É aqui que você define as configurações iniciais, como o tamanho da tela e a cor de fundo.</p>
+                                <div class="bg-teal-100 text-teal-800 p-4 rounded-md font-mono text-left text-sm">
+                                    size(400, 400);<br>
+                                    background(240);
+                                </div>
+                            </div>
+                            <div class="border border-zinc-200 p-6 rounded-lg">
+                                <h4 class="font-bold text-xl mb-2"><code>void draw()</code></h4>
+                                <p class="text-zinc-600 mb-4">Executa <strong class="text-teal-600">repetidamente</strong> em um loop (padrão de 60 vezes por segundo). É aqui que toda a mágica da animação e do desenho contínuo acontece.</p>
+                                 <div class="bg-teal-100 text-teal-800 p-4 rounded-md font-mono text-left text-sm">
+                                    // Desenha um círculo a cada quadro<br>
+                                    ellipse(200, 200, 50, 50);
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-brushes-content" class="tab-pane hidden">
+                        <h3 class="text-2xl font-bold mb-4 text-teal-700">Seus Pincéis Digitais: Formas e Cores</h3>
+                        <p class="text-zinc-600 mb-6">Controle o que aparece na tela com funções de desenho e cor. Use os controles abaixo para manipular a forma e ver o resultado em tempo real. Esta é a base de toda a composição visual.</p>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="md:col-span-1 space-y-4">
+                                <div>
+                                    <label for="slider-x" class="font-semibold text-sm">Posição X</label>
+                                    <input id="slider-x" type="range" min="0" max="400" value="200" class="w-full">
+                                </div>
+                                <div>
+                                    <label for="slider-y" class="font-semibold text-sm">Posição Y</label>
+                                    <input id="slider-y" type="range" min="0" max="400" value="200" class="w-full">
+                                </div>
+                                <div>
+                                    <label for="slider-w" class="font-semibold text-sm">Largura</label>
+                                    <input id="slider-w" type="range" min="10" max="300" value="150" class="w-full">
+                                </div>
+                                 <div>
+                                    <label for="slider-h" class="font-semibold text-sm">Altura</label>
+                                    <input id="slider-h" type="range" min="10" max="300" value="150" class="w-full">
+                                </div>
+                                <div>
+                                    <label for="color-fill" class="font-semibold text-sm">Cor de Preenchimento</label>
+                                    <input id="color-fill" type="color" value="#14B8A6" class="w-full h-10 border-0 cursor-pointer">
+                                </div>
+                            </div>
+                            <div class="md:col-span-2 flex items-center justify-center bg-gray-100 rounded-lg">
+                                <canvas id="canvas-brushes" width="400" height="400" class="w-full max-w-sm rounded-lg shadow-inner"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-random-content" class="tab-pane hidden">
+                        <h3 class="text-2xl font-bold mb-4 text-teal-700">O Coração da Arte Generativa: `random()`</h3>
+                        <p class="text-zinc-600 mb-6">A função `random()` é a chave para a imprevisibilidade. Ela gera números inesperados que podem ser usados para definir posição, tamanho e cor. Clique no botão para criar uma composição única a cada vez, demonstrando o poder da aleatoriedade controlada.</p>
+                        <div class="text-center mb-6">
+                             <button id="btn-random" class="bg-teal-600 text-white font-bold py-2 px-6 rounded-full hover:bg-teal-700 transition-colors">Gerar Padrão Aleatório</button>
+                        </div>
+                        <div class="flex items-center justify-center bg-gray-100 rounded-lg p-4">
+                           <canvas id="canvas-random" width="600" height="400" class="w-full max-w-2xl rounded-lg shadow-inner"></canvas>
+                        </div>
+                    </div>
+                     <div id="tab-loops-content" class="tab-pane hidden">
+                        <h3 class="text-2xl font-bold mb-4 text-teal-700">Repetição e Padrões com Loops</h3>
+                        <p class="text-zinc-600 mb-6">Loops são a forma mais eficiente de criar padrões e estruturas repetitivas. Em vez de escrever o mesmo código várias vezes, você define uma regra e a repete automaticamente. Loops `for` aninhados (um dentro do outro) são perfeitos para criar grades, como a que você vê abaixo.</p>
+                        <div class="flex items-center justify-center bg-gray-100 rounded-lg p-4">
+                           <canvas id="canvas-loops" width="600" height="400" class="w-full max-w-2xl rounded-lg shadow-inner"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tecnicas" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold">Técnicas Essenciais para Arte Dinâmica</h2>
+                <p class="text-lg text-zinc-600 mt-2 max-w-2xl mx-auto">Vá além do básico com técnicas que adicionam movimento, complexidade e uma sensação orgânica às suas criações.</p>
+            </div>
+             <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-lg p-8">
+                    <h3 class="text-2xl font-bold mb-4 text-teal-700">Transformações: `translate`, `rotate`, `scale`</h3>
+                    <p class="text-zinc-600 mb-6">Manipule o sistema de coordenadas para mover, girar e escalar formas com facilidade. Clique nos botões para aplicar transformações à forma no centro.</p>
+                    <div class="flex items-center justify-center bg-gray-100 rounded-lg mb-4 h-64">
+                        <canvas id="canvas-transforms" width="300" height="300"></canvas>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <button data-transform="translate" class="transform-btn bg-teal-500 text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-teal-600">Translate</button>
+                        <button data-transform="rotate" class="transform-btn bg-teal-500 text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-teal-600">Rotate</button>
+                        <button data-transform="scale" class="transform-btn bg-teal-500 text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-teal-600">Scale</button>
+                        <button data-transform="reset" class="bg-zinc-500 text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-zinc-600">Reset</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-8">
+                    <h3 class="text-2xl font-bold mb-4 text-teal-700">Movimento Orgânico: Ruído Perlin</h3>
+                    <p class="text-zinc-600 mb-6">Enquanto `random()` é caótico, o Ruído Perlin (`noise()`) cria uma aleatoriedade suave e natural. Veja a diferença no movimento das partículas abaixo.</p>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div>
+                            <h4 class="font-bold mb-2"><code>random()</code></h4>
+                            <div class="bg-gray-100 rounded-lg h-56">
+                                <canvas id="canvas-noise-random" class="w-full h-full rounded-lg"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2"><code>noise()</code></h4>
+                            <div class="bg-gray-100 rounded-lg h-56">
+                                <canvas id="canvas-noise-perlin" class="w-full h-full rounded-lg"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projetos" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold">Projetos Práticos</h2>
+                <p class="text-lg text-zinc-600 mt-2 max-w-2xl mx-auto">Aplique o que você aprendeu com estes exemplos guiados. Clique em "Ver Código" para explorar a implementação e ver uma prévia animada.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
+                    <div class="p-6 flex-grow">
+                        <h3 class="text-xl font-bold mb-2">1. Grade de Círculos Vibrantes</h3>
+                        <p class="text-zinc-600 text-sm mb-4">Combine loops `for` e `random()` para gerar uma grade estática onde cada círculo tem um tamanho e cor únicos. Um clássico "olá, mundo" da arte generativa.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50">
+                        <button class="project-btn bg-teal-600 text-white font-bold py-2 px-4 rounded-full w-full hover:bg-teal-700 transition-colors" data-project="1">Ver Código</button>
+                    </div>
+                </div>
+                 <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
+                    <div class="p-6 flex-grow">
+                        <h3 class="text-xl font-bold mb-2">2. Padrões com Linhas em Movimento</h3>
+                        <p class="text-zinc-600 text-sm mb-4">Introduza animação e classes para criar linhas que se movem de forma independente pela tela, deixando rastros e criando padrões dinâmicos.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50">
+                        <button class="project-btn bg-teal-600 text-white font-bold py-2 px-4 rounded-full w-full hover:bg-teal-700 transition-colors" data-project="2">Ver Código</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
+                    <div class="p-6 flex-grow">
+                        <h3 class="text-xl font-bold mb-2">3. Campo de Fluxo com Ruído Perlin</h3>
+                        <p class="text-zinc-600 text-sm mb-4">Use a função `noise()` para guiar o movimento de partículas, criando um "campo de fluxo" com padrões orgânicos e fluidos que se assemelham a fenômenos naturais.</p>
+                    </div>
+                    <div class="p-6 bg-gray-50">
+                        <button class="project-btn bg-teal-600 text-white font-bold py-2 px-4 rounded-full w-full hover:bg-teal-700 transition-colors" data-project="3">Ver Código</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="recursos" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold">Próximos Passos e Recursos</h2>
+                <p class="text-lg text-zinc-600 mt-2 max-w-2xl mx-auto">Sua jornada na arte generativa está apenas começando. Explore estes recursos para encontrar inspiração, aprofundar suas habilidades e conectar-se com a comunidade.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3">Inspiração</h3>
+                    <p class="text-zinc-600">Explore o trabalho de outros artistas em plataformas como <a href="#" class="text-teal-600 hover:underline">OpenProcessing</a> e <a href="#" class="text-teal-600 hover:underline">Dribbble</a>.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3">Documentação</h3>
+                    <p class="text-zinc-600">A <a href="#" class="text-teal-600 hover:underline">Referência Oficial</a> do Processing é sua melhor amiga para consultar funções e exemplos.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-3">Comunidade</h3>
+                    <p class="text-zinc-600">Faça perguntas e compartilhe seus projetos no <a href="#" class="text-teal-600 hover:underline">Fórum do Processing</a> e no subreddit <a href="#" class="text-teal-600 hover:underline">r/processing</a>.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-zinc-800 text-white">
+        <div class="container mx-auto px-6 py-4 text-center text-zinc-400">
+            <p>Guia Interativo de Arte Generativa. Inspirado no ecossistema Processing.</p>
+        </div>
+    </footer>
+
+    <div id="project-modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 opacity-0 invisible">
+        <div class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col transform scale-95">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 id="modal-title" class="text-xl font-bold"></h3>
+                <button id="modal-close-btn" class="text-zinc-500 hover:text-zinc-800">&times;</button>
+            </div>
+            <div class="flex-grow overflow-y-auto grid md:grid-cols-2 gap-4 p-6">
+                <div class="bg-zinc-800 text-white p-4 rounded-lg overflow-x-auto">
+                    <pre><code id="modal-code" class="language-processing text-sm"></code></pre>
+                </div>
+                <div class="bg-gray-100 rounded-lg flex items-center justify-center p-4">
+                    <canvas id="modal-canvas" width="400" height="400" class="max-w-full max-h-full"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const tabs = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            tabPanes.forEach(pane => {
+                pane.classList.add('hidden');
+            });
+
+            const targetPane = document.getElementById(tab.dataset.tab + '-content');
+            if (targetPane) {
+                targetPane.classList.remove('hidden');
+            }
+        });
+    });
+    tabs[0].click();
+
+    const brushesCanvas = document.getElementById('canvas-brushes');
+    const brushesCtx = brushesCanvas.getContext('2d');
+    const sliderX = document.getElementById('slider-x');
+    const sliderY = document.getElementById('slider-y');
+    const sliderW = document.getElementById('slider-w');
+    const sliderH = document.getElementById('slider-h');
+    const colorFill = document.getElementById('color-fill');
+
+    function drawBrushes() {
+        brushesCtx.fillStyle = '#f3f4f6';
+        brushesCtx.fillRect(0, 0, brushesCanvas.width, brushesCanvas.height);
+        
+        brushesCtx.fillStyle = colorFill.value;
+        brushesCtx.beginPath();
+        brushesCtx.ellipse(sliderX.value, sliderY.value, sliderW.value / 2, sliderH.value / 2, 0, 0, 2 * Math.PI);
+        brushesCtx.fill();
+    }
+
+    [sliderX, sliderY, sliderW, sliderH, colorFill].forEach(el => {
+        el.addEventListener('input', drawBrushes);
+    });
+    drawBrushes();
+
+    const randomCanvas = document.getElementById('canvas-random');
+    const randomCtx = randomCanvas.getContext('2d');
+    const btnRandom = document.getElementById('btn-random');
+
+    function drawRandom() {
+        randomCtx.fillStyle = '#f3f4f6';
+        randomCtx.fillRect(0, 0, randomCanvas.width, randomCanvas.height);
+
+        for(let i = 0; i < 100; i++) {
+            let x = Math.random() * randomCanvas.width;
+            let y = Math.random() * randomCanvas.height;
+            let size = Math.random() * 30 + 5;
+            let gray = Math.floor(Math.random() * 255);
+            randomCtx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
+            randomCtx.beginPath();
+            randomCtx.arc(x, y, size/2, 0, 2 * Math.PI);
+            randomCtx.fill();
+        }
+    }
+    btnRandom.addEventListener('click', drawRandom);
+    drawRandom();
+
+    const loopsCanvas = document.getElementById('canvas-loops');
+    const loopsCtx = loopsCanvas.getContext('2d');
+    
+    function drawLoops() {
+        loopsCtx.fillStyle = '#f3f4f6';
+        loopsCtx.fillRect(0, 0, loopsCanvas.width, loopsCanvas.height);
+        const gridSize = 40;
+        loopsCtx.fillStyle = '#4B5563';
+        for (let x = gridSize; x < loopsCanvas.width - gridSize / 2; x += gridSize) {
+            for (let y = gridSize; y < loopsCanvas.height - gridSize / 2; y += gridSize) {
+                let size = gridSize * 0.8;
+                loopsCtx.beginPath();
+                loopsCtx.arc(x, y, size/2, 0, 2 * Math.PI);
+                loopsCtx.fill();
+            }
+        }
+    }
+    drawLoops();
+
+    const transformsCanvas = document.getElementById('canvas-transforms');
+    const transformsCtx = transformsCanvas.getContext('2d');
+    const transformBtns = document.querySelectorAll('.transform-btn');
+    let angle = 0, scale = 1, translateX = 0;
+
+    function drawTransforms() {
+        transformsCtx.fillStyle = '#f3f4f6';
+        transformsCtx.fillRect(0, 0, transformsCanvas.width, transformsCanvas.height);
+        
+        transformsCtx.save();
+        transformsCtx.translate(transformsCanvas.width/2 + translateX, transformsCanvas.height/2);
+        transformsCtx.rotate(angle);
+        transformsCtx.scale(scale, scale);
+
+        transformsCtx.fillStyle = '#14B8A6';
+        transformsCtx.fillRect(-50, -50, 100, 100);
+        transformsCtx.restore();
+    }
+
+    transformBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const transform = e.target.dataset.transform;
+            if(transform === 'rotate') angle += Math.PI / 8;
+            if(transform === 'scale') scale = scale > 1 ? 1 : 1.5;
+            if(transform === 'translate') translateX = translateX > 0 ? 0 : 40;
+            if(transform === 'reset') {
+                angle = 0;
+                scale = 1;
+                translateX = 0;
+            }
+            drawTransforms();
+        });
+    });
+    drawTransforms();
+    
+    
+    const noiseRandomCanvas = document.getElementById('canvas-noise-random');
+    const noiseRandomCtx = noiseRandomCanvas.getContext('2d');
+    const perlinCanvas = document.getElementById('canvas-noise-perlin');
+    const perlinCtx = perlinCanvas.getContext('2d');
+
+    const particlesRandom = Array.from({length: 50}, () => ({x: Math.random() * noiseRandomCanvas.width, y: Math.random() * noiseRandomCanvas.height, vx: 0, vy: 0}));
+    const particlesPerlin = Array.from({length: 50}, () => ({x: Math.random() * perlinCanvas.width, y: Math.random() * perlinCanvas.height, vx: 0, vy: 0}));
+    let noiseTime = 0;
+    
+    class Perlin {
+        constructor() {
+            this.p = new Uint8Array(512);
+            const permutation = Array.from({length: 256}, (_, i) => i).sort(() => Math.random() - 0.5);
+            for (let i = 0; i < 256; i++) this.p[i] = this.p[i + 256] = permutation[i];
+        }
+        fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+        lerp(t, a, b) { return a + t * (b - a); }
+        grad(hash, x, y) {
+            const h = hash & 15;
+            const u = h < 8 ? x : y, v = h < 8 ? y : x;
+            return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+        }
+        noise(x, y) {
+            const X = Math.floor(x) & 255, Y = Math.floor(y) & 255;
+            x -= Math.floor(x); y -= Math.floor(y);
+            const u = this.fade(x), v = this.fade(y);
+            const p = this.p, A = p[X] + Y, B = p[X + 1] + Y;
+            return this.lerp(v, this.lerp(u, this.grad(p[A], x, y), this.grad(p[B], x - 1, y)),
+                               this.lerp(u, this.grad(p[A + 1], x, y - 1), this.grad(p[B + 1], x - 1, y - 1)));
+        }
+    }
+    const perlin = new Perlin();
+
+    function animateNoise() {
+        noiseRandomCtx.fillStyle = 'rgba(243, 244, 246, 0.1)';
+        noiseRandomCtx.fillRect(0, 0, noiseRandomCanvas.width, noiseRandomCanvas.height);
+        noiseRandomCtx.fillStyle = '#4B5563';
+        particlesRandom.forEach(p => {
+            p.vx += (Math.random() - 0.5) * 0.5;
+            p.vy += (Math.random() - 0.5) * 0.5;
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > noiseRandomCanvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > noiseRandomCanvas.height) p.vy *= -1;
+            p.vx *= 0.95; p.vy *= 0.95;
+            noiseRandomCtx.beginPath();
+            noiseRandomCtx.arc(p.x, p.y, 2, 0, 2*Math.PI);
+            noiseRandomCtx.fill();
+        });
+
+        perlinCtx.fillStyle = 'rgba(243, 244, 246, 0.1)';
+        perlinCtx.fillRect(0, 0, perlinCanvas.width, perlinCanvas.height);
+        perlinCtx.fillStyle = '#14B8A6';
+        particlesPerlin.forEach(p => {
+            const angle = perlin.noise(p.x * 0.01, p.y * 0.01 + noiseTime) * Math.PI * 2;
+            p.x += Math.cos(angle);
+            p.y += Math.sin(angle);
+            if(p.x < 0) p.x = perlinCanvas.width;
+            if(p.x > perlinCanvas.width) p.x = 0;
+            if(p.y < 0) p.y = perlinCanvas.height;
+            if(p.y > perlinCanvas.height) p.y = 0;
+
+            perlinCtx.beginPath();
+            perlinCtx.arc(p.x, p.y, 2, 0, 2*Math.PI);
+            perlinCtx.fill();
+        });
+        noiseTime += 0.005;
+
+        requestAnimationFrame(animateNoise);
+    }
+    animateNoise();
+
+
+    const projectModal = document.getElementById('project-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalCode = document.getElementById('modal-code');
+    const modalCanvas = document.getElementById('modal-canvas');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    let activeAnimationId = null;
+
+    const projects = {
+        '1': {
+            title: 'Projeto 1: Grade de Círculos Vibrantes',
+            code: `int gridSize = 20;
+
+void setup() {
+  size(400, 400);
+  background(255);
+  noStroke();
+  noLoop(); 
+}
+
+void draw () {
+  for (int x = gridSize; x < width; x += gridSize) {
+    for (int y = gridSize; y < height; y += gridSize) {
+      float circleSize = random(gridSize * 0.3, gridSize);
+      fill(random(100, 200), random(150, 250), random(180, 255), 150);
+      ellipse(x, y, circleSize, circleSize);
+    }
+  }
+}`,
+            drawFunc: (ctx) => {
+                ctx.fillStyle = '#f3f4f6';
+                ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                const gridSize = 20;
+                for (let x = gridSize; x < ctx.canvas.width; x += gridSize) {
+                    for (let y = gridSize; y < ctx.canvas.height; y += gridSize) {
+                        const circleSize = Math.random() * (gridSize - gridSize * 0.3) + gridSize * 0.3;
+                        const r = Math.random() * 100 + 100;
+                        const g = Math.random() * 100 + 150;
+                        const b = Math.random() * 75 + 180;
+                        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.8)`;
+                        ctx.beginPath();
+                        ctx.arc(x, y, circleSize / 2, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                }
+            }
+        },
+        '2': {
+            title: 'Projeto 2: Linhas em Movimento',
+            code: `class MovingLine {
+  float ypos, speed;
+  color c;
+  
+  MovingLine(float y, float s, color _c) {
+    ypos = y;
+    speed = s;
+    c = _c;
+  }
+  
+  void update() {
+    ypos += speed;
+    if (ypos > height) ypos = 0;
+    
+    stroke(c);
+    strokeWeight(random(1, 4));
+    line(0, ypos, width, ypos);
+  }
+}
+
+MovingLine[] lines = new MovingLine[50];
+
+void setup() {
+  size(400, 400);
+  for (int i = 0; i < lines.length; i++) {
+    lines[i] = new MovingLine(random(height), random(0.5, 3), color(random(255), 150, 200, 100));
+  }
+}
+
+void draw() {
+  background(0, 20);
+  for (int i = 0; i < lines.length; i++) {
+    lines[i].update();
+  }
+}`,
+            init: (ctx) => {
+                let lines = [];
+                for(let i = 0; i < 50; i++) {
+                    lines.push({
+                        y: Math.random() * ctx.canvas.height,
+                        speed: Math.random() * 2.5 + 0.5,
+                        color: `rgba(${Math.random()*255}, 150, 200, ${Math.random()*0.5 + 0.3})`
+                    });
+                }
+                return { lines };
+            },
+            drawFunc: (ctx, state) => {
+                ctx.fillStyle = 'rgba(17, 24, 39, 0.1)';
+                ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                state.lines.forEach(line => {
+                    line.y += line.speed;
+                    if(line.y > ctx.canvas.height) line.y = 0;
+                    ctx.strokeStyle = line.color;
+                    ctx.lineWidth = Math.random() * 3 + 1;
+                    ctx.beginPath();
+                    ctx.moveTo(0, line.y);
+                    ctx.lineTo(ctx.canvas.width, line.y);
+                    ctx.stroke();
+                });
+            }
+        },
+        '3': {
+            title: 'Projeto 3: Campo de Fluxo Perlin',
+            code: `float zoff = 0.0;
+
+void setup() {
+  size(400, 400);
+  background(255);
+}
+
+void draw() {
+  background(255, 5); // Fundo com "rastro"
+  float scale = 0.02;
+
+  for (int x = 0; x < width; x+=10) {
+    for (int y = 0; y < height; y+=10) {
+      float angle = noise(x * scale, y * scale, zoff) * TWO_PI * 2;
+      
+      pushMatrix();
+      translate(x, y);
+      rotate(angle);
+      stroke(0, 50);
+      line(0, 0, 15, 0);
+      popMatrix();
+    }
+  }
+  zoff += 0.005;
+}`,
+            init: (ctx) => ({ zoff: 0, noiseGen: new Perlin() }),
+            drawFunc: (ctx, state) => {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                const scale = 0.02;
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.lineWidth = 1;
+                for (let x = 0; x < ctx.canvas.width; x += 10) {
+                    for (let y = 0; y < ctx.canvas.height; y += 10) {
+                        const angle = state.noiseGen.noise(x * scale, y * scale, state.zoff) * Math.PI * 4;
+                        ctx.save();
+                        ctx.translate(x, y);
+                        ctx.rotate(angle);
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0);
+                        ctx.lineTo(15, 0);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+                state.zoff += 0.005;
+            }
+        }
+    };
+    
+    function openModal(projectId) {
+        if (activeAnimationId) {
+            cancelAnimationFrame(activeAnimationId);
+            activeAnimationId = null;
+        }
+
+        const project = projects[projectId];
+        if (!project) return;
+        
+        modalTitle.textContent = project.title;
+        modalCode.textContent = project.code;
+        projectModal.classList.remove('invisible', 'opacity-0');
+        projectModal.querySelector('.modal-content').classList.remove('scale-95');
+
+        const ctx = modalCanvas.getContext('2d');
+
+        if (project.init) {
+            const state = project.init(ctx);
+            function animate() {
+                project.drawFunc(ctx, state);
+                activeAnimationId = requestAnimationFrame(animate);
+            }
+            animate();
+        } else {
+            project.drawFunc(ctx);
+        }
+    }
+
+    function closeModal() {
+        if (activeAnimationId) {
+            cancelAnimationFrame(activeAnimationId);
+            activeAnimationId = null;
+        }
+        projectModal.classList.add('invisible', 'opacity-0');
+        projectModal.querySelector('.modal-content').classList.add('scale-95');
+    }
+
+    document.querySelectorAll('.project-btn').forEach(btn => {
+        btn.addEventListener('click', () => openModal(btn.dataset.project));
+    });
+    
+    modalCloseBtn.addEventListener('click', closeModal);
+    projectModal.addEventListener('click', (e) => {
+        if (e.target === projectModal) closeModal();
+    });
+});
+</script>
+</body>
+</html>
